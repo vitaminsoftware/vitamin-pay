@@ -29,7 +29,17 @@ TRANSACTION_SUCCESS_STATUSES = [
 
 @app.route('/', methods=['GET'])
 def index():
-    return redirect(url_for('new_checkout'))
+    return render_template('index.html');
+
+@app.route('/checkouts/<string:invoice>/<int:amount>', methods=['GET'])
+def new_checkout_invoice(invoice, amount):
+    client_token = braintree.ClientToken.generate()
+    return render_template(
+        'checkouts/new.html',
+        client_token=client_token,
+        invoice=invoice, 
+        amount=amount / 100.0,
+    )
 
 @app.route('/checkouts/new', methods=['GET'])
 def new_checkout():
@@ -42,15 +52,15 @@ def show_checkout(transaction_id):
     result = {}
     if transaction.status in TRANSACTION_SUCCESS_STATUSES:
         result = {
-            'header': 'Sweet Success!',
+            'header': 'Success!',
             'icon': 'success',
-            'message': 'Your test transaction has been successfully processed. See the Braintree API response and try again.'
+            'message': 'Your transaction has been successfully processed. Thank you for your business!'
         }
     else:
         result = {
             'header': 'Transaction Failed',
             'icon': 'fail',
-            'message': 'Your test transaction has a status of ' + transaction.status + '. See the Braintree API response and try again.'
+            'message': 'Your transaction has a status of ' + transaction.status + '.'
         }
 
     return render_template('checkouts/show.html', transaction=transaction, result=result)
@@ -59,6 +69,7 @@ def show_checkout(transaction_id):
 def create_checkout():
     result = braintree.Transaction.sale({
         'amount': request.form['amount'],
+        'order_id': request.form['invoice'],
         'payment_method_nonce': request.form['payment_method_nonce'],
     })
 
