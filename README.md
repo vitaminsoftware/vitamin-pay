@@ -17,6 +17,15 @@ The repo is based on the [Braintree integration for Flask example](https://githu
   python app.py
   ```
 
+## Usage
+
+The app will process card payments for invoices issued by **Vitamin Software LLC invoices ONLY**. The payment form is unique to each invoice and follows the pattern http://pay.vitaminsoftware.com/checkouts/[invoice]/[amount].
+- *invoice* field should match the invoice number we'd like to get paid for;
+- *amount* represents the total value of the invoice in cents (USD pence).
+
+For example to receive a payment for invoice **VIT00117** in the amount of **$218.75** the following URL should be distributed to the client: `http://pay.vitaminsoftware.com/checkouts/VIT00117/21875`. 
+
+
 ## Deploying to Heroku
 
 You can deploy this app directly to Heroku to see the app live. Skip the setup instructions above and click the button below. This will walk you through getting this app up and running on Heroku in minutes.
