@@ -1,5 +1,5 @@
 {
-  "name": "Vitamin Software Payment System",
+  "name": "Vitamin Software Payment",
   "description": "Handles ad-hoc credit card and Paypal payments for Vitamin Software LLC invoices",
   "keywords": ["braintree", "python", "flask"],
   "website": "https://www.braintreepayments.com",
