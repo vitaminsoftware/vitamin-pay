@@ -5,9 +5,12 @@
   <div class="checkout container">
 
     <header>
-      <h1>Hi, <br>Let's test a transaction</h1>
+      <h1>Thank you for your business!</h1>
       <p>
-        Make a test payment with Braintree using PayPal or a card
+        Make a payment for invoice <strong>{{ invoice }}</strong> in the amount of <strong>{{ "${:,.2f}".format(amount) }}</strong>.
+      </p>
+      <p>
+        Note: for cards issued outside of US or Canada please use the Postal Code <strong>00000</strong>.
       </p>
     </header>
 
@@ -20,12 +23,13 @@
           <label for="amount">
             <span class="input-label">Amount</span>
             <div class="input-wrapper amount-wrapper">
-              <input id="amount" name="amount" type="tel" min="1" placeholder="Amount" value="10">
+              <input id="amount" name="amount" type="tel" min="1" placeholder="Amount" value="{{ amount }}" readonly>
+              <input id="invoice" name="invoice" type="hidden" value="{{ invoice }}">
             </div>
           </label>
         </section>
 
-      <button class="button" type="submit"><span>Test Transaction</span></button>
+      <button class="button" type="submit"><span>Submit payment</span></button>
     </form>
 
   </div>
