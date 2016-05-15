@@ -14,8 +14,8 @@
       </section>
 
       <section>
-        <a class="button primary back" href="/checkouts/new">
-          <span>Test Another Transaction</span>
+        <a class="button primary back" href="#">
+          <span>Back to the payment form</span>
         </a>
       </section>
     </div>
@@ -153,4 +153,11 @@
     </section>
   </article>
 </aside>
+
+<script>
+  $('a.back').click(function(){
+    parent.history.back();
+    return false;
+  });
+</script>
 {% endblock %}
