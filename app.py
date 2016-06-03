@@ -74,10 +74,14 @@ def create_checkout():
     })
 
     if result.is_success or result.transaction:
-        return redirect(url_for('show_checkout',transaction_id=result.transaction.id))
+        return redirect(url_for('show_checkout', transaction_id=result.transaction.id))
     else:
         for x in result.errors.deep_errors: flash('Error: %s: %s' % (x.code, x.message))
-        return redirect(url_for('new_checkout'))
+        return redirect(url_for(
+            'new_checkout_invoice',
+            invoice=request.form['invoice'],
+            amount=int(float(request.form['amount'])*100),
+        ))
 
 if __name__ == '__main__':
     app.run(host='0.0.0.0', port=4567, debug=True)
