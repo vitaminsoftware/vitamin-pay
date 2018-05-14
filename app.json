@@ -24,6 +24,18 @@
       "description": "Your Braintree Private Key",
       "required": true
     },
+    "BT_MERCHANT_ACCOUNT_EUR": {
+      "description": "Your Braintree EUR Merchant Account ID (for multiple currencies)",
+      "required": false
+    },
+    "BT_MERCHANT_ACCOUNT_GBP": {
+      "description": "Your Braintree GBP Merchant Account ID (for multiple currencies)",
+      "required": false
+    },
+    "BT_MERCHANT_ACCOUNT_USD": {
+      "description": "Your Braintree USD Merchant Account ID (for multiple currencies)",
+      "required": false
+    },
     "APP_SECRET_KEY": {
       "description": "A unique secret key; a long, random set of characters",
       "required": true,

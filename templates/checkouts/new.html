@@ -1,13 +1,14 @@
 {% extends 'layout.html' %}
 {% block content %}
 
+<style>.amount-wrapper:after { content: "{{ currency_symbol.decode('utf-8') }}";}</style>
 <div class="wrapper">
   <div class="checkout container">
 
     <header>
       <h1>Thank you for your business!</h1>
       <p>
-        Make a payment for invoice <strong>{{ invoice }}</strong> in the amount of <strong>{{ "${:,.2f}".format(amount) }}</strong>.
+        Make a payment for invoice <strong>{{ invoice }}</strong> in the amount of <strong>{{ "{!s} {:,.2f}".format(currency, amount) }}</strong>.
       </p>
       <p>
         Note: for cards issued outside of US or Canada please use the Postal Code <strong>00000</strong>.
@@ -20,15 +21,15 @@
           <div id="bt-dropin"></div>
         </div>
 
-          <label for="amount">
-            <span class="input-label">Amount</span>
-            <div class="input-wrapper amount-wrapper">
-              <input id="amount" name="amount" type="tel" min="1" placeholder="Amount" value="{{ amount }}" readonly>
-              <input id="invoice" name="invoice" type="hidden" value="{{ invoice }}">
-            </div>
-          </label>
-        </section>
-
+        <label for="amount">
+          <span class="input-label">Amount</span>
+          <div class="input-wrapper amount-wrapper">
+            <input id="amount" name="amount" type="tel" min="1" placeholder="Amount" value="{{ amount }}">
+          </div>
+        </label>
+        <input id="invoice" name="invoice" type="hidden" value="{{ invoice }}">
+        <input id="currency" name="currency" type="hidden" value="{{ currency }}">
+      </section>
       <button class="button" type="submit"><span>Submit payment</span></button>
     </form>
 

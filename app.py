@@ -1,3 +1,4 @@
+# -*- coding: utf8 -*-
 from flask import Flask, redirect, url_for, render_template, request, flash
 
 import os
@@ -14,7 +15,7 @@ braintree.Configuration.configure(
     os.environ.get('BT_ENVIRONMENT'),
     os.environ.get('BT_MERCHANT_ID'),
     os.environ.get('BT_PUBLIC_KEY'),
-    os.environ.get('BT_PRIVATE_KEY')
+    os.environ.get('BT_PRIVATE_KEY'),
 )
 
 TRANSACTION_SUCCESS_STATUSES = [
@@ -27,18 +28,34 @@ TRANSACTION_SUCCESS_STATUSES = [
     braintree.Transaction.Status.SubmittedForSettlement
 ]
 
+CURRENCY_SYMBOLS = {
+    'EUR': '€',
+    'USD': '$',
+    'GBP': '£',
+}
+
+CURRENCY_ACCOUNTS = {
+    'EUR': os.environ.get('BT_MERCHANT_ACCOUNT_EUR'),
+    'USD': os.environ.get('BT_MERCHANT_ACCOUNT_USD'),
+    'GBP': os.environ.get('BT_MERCHANT_ACCOUNT_GBP'),
+}
+
 @app.route('/', methods=['GET'])
 def index():
     return render_template('index.html');
 
-@app.route('/checkouts/<string:invoice>/<int:amount>', methods=['GET'])
-def new_checkout_invoice(invoice, amount):
+@app.route('/checkouts/<string:invoice>/<int:amount>', methods=['GET'], defaults={'currency': 'USD'})
+@app.route('/checkouts/<string:invoice>/<int:amount>/<string:currency>', methods=['GET'])
+def new_checkout_invoice(invoice, amount, currency):
     client_token = braintree.ClientToken.generate()
+    currency_symbol = CURRENCY_SYMBOLS[currency]
     return render_template(
         'checkouts/new.html',
         client_token=client_token,
         invoice=invoice, 
         amount=amount / 100.0,
+        currency=currency,
+        currency_symbol=currency_symbol,
     )
 
 @app.route('/checkouts/new', methods=['GET'])
@@ -67,11 +84,17 @@ def show_checkout(transaction_id):
 
 @app.route('/checkouts', methods=['POST'])
 def create_checkout():
-    result = braintree.Transaction.sale({
+    sale_payload = {
         'amount': request.form['amount'],
         'order_id': request.form['invoice'],
         'payment_method_nonce': request.form['payment_method_nonce'],
-    })
+    }
+
+    currency_account = CURRENCY_ACCOUNTS[request.form['currency']]
+    if currency_account:
+        sale_info['merchant_account_id'] = currency_account
+
+    result = braintree.Transaction.sale(sale_payload)
 
     if result.is_success or result.transaction:
         return redirect(url_for('show_checkout', transaction_id=result.transaction.id))
@@ -81,6 +104,7 @@ def create_checkout():
             'new_checkout_invoice',
             invoice=request.form['invoice'],
             amount=int(float(request.form['amount'])*100),
+            currency=request.form['currency'],
         ))
 
 if __name__ == '__main__':
