@@ -92,7 +92,7 @@ def create_checkout():
 
     currency_account = CURRENCY_ACCOUNTS[request.form['currency']]
     if currency_account:
-        sale_info['merchant_account_id'] = currency_account
+        sale_payload['merchant_account_id'] = currency_account
 
     result = braintree.Transaction.sale(sale_payload)
 
