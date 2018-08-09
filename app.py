@@ -5,8 +5,10 @@ import os
 from os.path import join, dirname
 from dotenv import load_dotenv
 import braintree
+from flask_sslify import SSLify
 
 app = Flask(__name__)
+sslify = SSLify(app)
 dotenv_path = join(dirname(__file__), '.env')
 load_dotenv(dotenv_path)
 app.secret_key = os.environ.get('APP_SECRET_KEY')
