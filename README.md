@@ -10,12 +10,14 @@ The repo is based on the [Braintree integration for Flask example](https://githu
   pip install -r requirements.txt
   ```
 
-2. Copy the `example.env` file to `.env` and fill in your Braintree API credentials. Credentials can be found by navigating to Account > My User > View Authorizations in the Braintree Control Panel. Full instructions can be [found on our support site](https://articles.braintreepayments.com/control-panel/important-gateway-credentials#api-credentials).
+2. Copy the contents of `example.env` into a new file named `.env` and fill in your Braintree API credentials. Credentials can be found by navigating to Account > My User > View Authorizations in the Braintree Control Panel. Full instructions can be [found on our support site](https://articles.braintreepayments.com/control-panel/important-gateway-credentials#api-credentials).
 
 3. Start server:
   ```sh
   python app.py
   ```
+
+By default, this runs the app on port `4567`. You can configure the port by setting the environmental variable `PORT`.
 
 ## Usage
 
@@ -24,6 +26,7 @@ The app will process card payments for invoices issued by **Vitamin Software LLC
 - *amount* represents the total value of the invoice in cents (USD pence).
 
 For example to receive a payment for invoice **VIT00117** in the amount of **$218.75** the following URL should be distributed to the client: `http://pay.vitaminsoftware.com/checkouts/VIT00117/21875`. 
+
 
 
 ## Deploying to Heroku
@@ -36,9 +39,13 @@ You can deploy this app directly to Heroku to see the app live. Skip the setup i
 
 Unit tests do not make API calls to Braintree and do not require Braintree credentials. You can run this project's unit tests by calling `python test_app.py` on the command line.
 
+## Testing Transactions
+
+Sandbox transactions must be made with [sample credit card numbers](https://developers.braintreepayments.com/reference/general/testing/python#credit-card-numbers), and the response of a `Transaction.sale()` call is dependent on the [amount of the transaction](https://developers.braintreepayments.com/reference/general/testing/python#test-amounts).
+
 ## Pro Tips
 
-- The `application.cfg.example` contains an `APP_SECRET_KEY` setting. Even in development you should [generate your own custom secret key for your app](http://flask.pocoo.org/docs/0.10/quickstart/#sessions).
+- The `application.cfg.example` contains an `APP_SECRET_KEY` setting. Even in development you should [generate your own custom secret key for your app](https://flask.palletsprojects.com/en/1.0.x/quickstart/#sessions).
 
 ## Help
 

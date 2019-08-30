@@ -5,13 +5,18 @@ import os
 from os.path import join, dirname
 from dotenv import load_dotenv
 import braintree
+from gateway import generate_client_token, transact, find_transaction
+
 from flask_sslify import SSLify
 
+load_dotenv()
+
 app = Flask(__name__)
-sslify = SSLify(app)
-dotenv_path = join(dirname(__file__), '.env')
-load_dotenv(dotenv_path)
 app.secret_key = os.environ.get('APP_SECRET_KEY')
+
+PORT = int(os.environ.get('PORT', 4567))
+
+sslify = SSLify(app)
 
 braintree.Configuration.configure(
     os.environ.get('BT_ENVIRONMENT'),
@@ -62,12 +67,12 @@ def new_checkout_invoice(invoice, amount, currency):
 
 @app.route('/checkouts/new', methods=['GET'])
 def new_checkout():
-    client_token = braintree.ClientToken.generate()
+    client_token = generate_client_token()
     return render_template('checkouts/new.html', client_token=client_token)
 
 @app.route('/checkouts/<transaction_id>', methods=['GET'])
 def show_checkout(transaction_id):
-    transaction = braintree.Transaction.find(transaction_id)
+    transaction = find_transaction(transaction_id)
     result = {}
     if transaction.status in TRANSACTION_SUCCESS_STATUSES:
         result = {
@@ -90,13 +95,17 @@ def create_checkout():
         'amount': request.form['amount'],
         'order_id': request.form['invoice'],
         'payment_method_nonce': request.form['payment_method_nonce'],
+        'options': {
+            'submit_for_settlement': True
+        }
     }
 
     currency_account = CURRENCY_ACCOUNTS[request.form['currency']]
     if currency_account:
         sale_payload['merchant_account_id'] = currency_account
 
-    result = braintree.Transaction.sale(sale_payload)
+    result = transact(sale_payload)
+    
 
     if result.is_success or result.transaction:
         return redirect(url_for('show_checkout', transaction_id=result.transaction.id))
@@ -110,4 +119,4 @@ def create_checkout():
         ))
 
 if __name__ == '__main__':
-    app.run(host='0.0.0.0', port=4567, debug=True)
+    app.run(host='0.0.0.0', port=PORT, debug=True)
