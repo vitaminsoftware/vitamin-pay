@@ -52,7 +52,7 @@ CURRENCY_ACCOUNTS = {
 
 @auth.verify_password
 def verify_password(username, password):
-    return (username == os.environ.get('BT_AUTH_USER')) and 
+    return (username == os.environ.get('BT_AUTH_USER')) and \
             (password == os.environ.get('BT_AUTH_PASSWORD'))
 
 @app.route('/', methods=['GET'])
