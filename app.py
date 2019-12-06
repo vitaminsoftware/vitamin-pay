@@ -1,5 +1,6 @@
 # -*- coding: utf8 -*-
 from flask import Flask, redirect, url_for, render_template, request, flash
+from flask_httpauth import HTTPBasicAuth
 
 import os
 from os.path import join, dirname
@@ -12,6 +13,8 @@ from flask_sslify import SSLify
 load_dotenv()
 
 app = Flask(__name__)
+auth = HTTPBasicAuth()
+
 app.secret_key = os.environ.get('APP_SECRET_KEY')
 
 PORT = int(os.environ.get('PORT', 4567))
@@ -47,12 +50,19 @@ CURRENCY_ACCOUNTS = {
     'GBP': os.environ.get('BT_MERCHANT_ACCOUNT_GBP'),
 }
 
+@auth.verify_password
+def verify_password(username, password):
+    return (username == os.environ.get('BT_AUTH_USER')) and 
+            (password == os.environ.get('BT_AUTH_PASSWORD'))
+
 @app.route('/', methods=['GET'])
+@auth.login_required
 def index():
     return render_template('index.html');
 
 @app.route('/checkouts/<string:invoice>/<int:amount>', methods=['GET'], defaults={'currency': 'USD'})
 @app.route('/checkouts/<string:invoice>/<int:amount>/<string:currency>', methods=['GET'])
+@auth.login_required
 def new_checkout_invoice(invoice, amount, currency):
     client_token = braintree.ClientToken.generate()
     currency_symbol = CURRENCY_SYMBOLS[currency]
@@ -66,11 +76,13 @@ def new_checkout_invoice(invoice, amount, currency):
     )
 
 @app.route('/checkouts/new', methods=['GET'])
+@auth.login_required
 def new_checkout():
     client_token = generate_client_token()
     return render_template('checkouts/new.html', client_token=client_token)
 
 @app.route('/checkouts/<transaction_id>', methods=['GET'])
+@auth.login_required
 def show_checkout(transaction_id):
     transaction = find_transaction(transaction_id)
     result = {}
@@ -90,6 +102,7 @@ def show_checkout(transaction_id):
     return render_template('checkouts/show.html', transaction=transaction, result=result)
 
 @app.route('/checkouts', methods=['POST'])
+@auth.login_required
 def create_checkout():
     sale_payload = {
         'amount': request.form['amount'],
