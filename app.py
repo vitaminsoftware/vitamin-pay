@@ -50,6 +50,8 @@ CURRENCY_ACCOUNTS = {
     'GBP': os.environ.get('BT_MERCHANT_ACCOUNT_GBP'),
 }
 
+RECAPTCHA_SITE_KEY = os.environ.get('BT_RECAPTCHA_SITE_KEY') 
+
 @auth.verify_password
 def verify_password(username, password):
     return (username == os.environ.get('BT_AUTH_USER')) and \
@@ -73,13 +75,14 @@ def new_checkout_invoice(invoice, amount, currency):
         amount=amount / 100.0,
         currency=currency,
         currency_symbol=currency_symbol,
+        recaptcha_token=RECAPTCHA_SITE_KEY,
     )
 
 @app.route('/checkouts/new', methods=['GET'])
 @auth.login_required
 def new_checkout():
     client_token = generate_client_token()
-    return render_template('checkouts/new.html', client_token=client_token)
+    return render_template('checkouts/new.html', client_token=client_token, recaptcha_token=RECAPTCHA_SITE_KEY)
 
 @app.route('/checkouts/<transaction_id>', methods=['GET'])
 @auth.login_required
